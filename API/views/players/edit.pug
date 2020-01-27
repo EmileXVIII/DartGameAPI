@@ -1,0 +1,17 @@
+extends ../layout
+
+block content
+  form(
+    method="post"
+    action=action
+  )
+    label
+      strong Name
+      input(name="pseudo" value=player.name)
+
+    label
+      strong Email
+      input(name="email" value=player.email)
+
+    label
+      input(type="submit" value="Envoyer")

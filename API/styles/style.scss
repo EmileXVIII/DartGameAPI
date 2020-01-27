@@ -1,0 +1,11 @@
+@import "./settings";
+
+body {
+  background-color: $color-primary;
+  font: $font-primary;
+  color: $color-secondary;
+}
+
+label {
+  display: block;
+}
