@@ -2,17 +2,17 @@ import assertPlayer from "../../asserts/assertPlayer";
 import MongoDb from "./MongoDb";import assertNumber from "../../asserts/assertNumber";
 undefined
 const router =  require('express').Router();
-const bddPlayer:MongoDb = require("../router.ts").bddPlayer
+const bddPlayer:MongoDb = require("../router.ts").bddPlayers
 
-router.get('/',function(req,res,next){
+router.get('/',async function(req,res,next){
 
     let limit:number=assertNumber(req.limit)?req.limit:50;
     let offset:number=assertNumber(req.offset)?req.offset:1;
-    let players=bddPlayer.getAll(limit,offset)
+    let players=await bddPlayer.getAll(limit,offset)
       res.format({
         html: () => {
             res.status=201;
-            res.render('views/players/index.pug', {
+            res.render('players/index.pug', {
                 players:players,
                 title:"getPlayers offset "+offset+" limit "+limit
             })
@@ -35,13 +35,14 @@ router.post('/',function(req,res,next){
         res.send();
     }
 });
-router.get('/:id',function(req,res,next){
+router.get('/:id',async function(req,res,next){
     if (assertNumber(req.params.id)){
-        let player =  bddPlayer.get(req.params.id);
+        let player = await bddPlayer.get(req.params.id);
+        console.log(player)
         res.format({
         html: () => {
             res.status=201;
-            res.render('views/players/index.pug', {
+            res.render('players/index.pug', {
                 players:[player],
                 title:"getPlayer id "+req.params.id
             })
@@ -55,16 +56,17 @@ router.get('/:id',function(req,res,next){
     }
 })
 router.get('/new',function(req,res,next){
-    let player={}
+    let player={};
     player["name"]="";
     player["email"]="";
     res.format({
     html: () => {
         res.status=201;
-        res.render('views/players/edit.pug', {
+        res.render('players/edit.pug', {
             action:"/game/players",
             title:"Form New Player",
-            player:player
+            player:player,
+            method:"post"
         })
     },
     json: () => {
@@ -73,16 +75,17 @@ router.get('/new',function(req,res,next){
     }
     }).catch(next)
 })
-router.get('/:id/edit',function(req,res,next){
+router.get('/:id/edit',async function(req,res,next){
     if (assertNumber(req.params.id)){
-        let player=bddPlayer.get(req.id);
+        let player=await bddPlayer.get(req.params.id);
         res.format({
         html: () => {
             res.status=201;
-            res.render('views/players/edit.pug', {
-                action:"/game/players",
+            res.render('players/edit.pug', {
+                action:"/game/players/"+req.params.id,
                 title:"Form New Player",
-                player:player
+                player:player,
+                method:"patch"
             })
         },
         json: () => {

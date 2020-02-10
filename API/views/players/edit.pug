@@ -2,12 +2,12 @@ extends ../layout
 
 block content
   form(
-    method="post"
+    method=method
     action=action
   )
     label
       strong Name
-      input(name="pseudo" value=player.name)
+      input(name="name" value=player.name)
 
     label
       strong Email

@@ -1,10 +1,11 @@
 import MongoDb from "./routes/MongoDb";
-const urlBdd ="mongodb://root:pwd@localhost:3306/"
+const urlBdd = require('../main.ts').urlBdd
+const host = require('../main.ts').host
 const router = require('express').Router();
+const bddPlayer = new MongoDb(["id","name","email"],["rowid","name","email"],urlBdd,"dbPlayer","players")
+module.exports = {"router":router,"bddPlayers":bddPlayer};
 const gameRouter = require('./routes/games.ts');
 const playerRouter = require('./routes/players.ts');
-const bddPlayer = new MongoDb(["id","name","email"],["rowid","name","email"],urlBdd,"dbPlayer","players")
-bddPlayer.init();
 router.get("/",function(req,res,next){
     res.format({
         html: () => {
@@ -20,6 +21,5 @@ router.get("/",function(req,res,next){
         }
     }).catch(next)
 });
-module.exports = {"router":router,"bddPlayers":bddPlayer};
 router.use("/game",gameRouter);
 router.use("/players",playerRouter);
