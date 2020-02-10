@@ -1,10 +1,10 @@
 import assertPlayer from "../../asserts/assertPlayer";
 import MongoDb from "./MongoDb";import assertNumber from "../../asserts/assertNumber";
 undefined
-const router = require("../main.ts").router
-const bddPlayer:MongoDb = require("../main.ts").bddPlayer
+const router =  require('express').Router();
+const bddPlayer:MongoDb = require("../router.ts").bddPlayer
 
-router.get('/players',function(req,res,next){
+router.get('/',function(req,res,next){
 
     let limit:number=assertNumber(req.limit)?req.limit:50;
     let offset:number=assertNumber(req.offset)?req.offset:1;
@@ -24,7 +24,7 @@ router.get('/players',function(req,res,next){
         }
     }).catch(next)
 })
-router.post('/players',function(req,res,next){
+router.post('/',function(req,res,next){
     if(assertPlayer(req.body)){
         bddPlayer.insert({"name":req.body.name,"email":req.body.email});
         res.status=201;
@@ -35,7 +35,7 @@ router.post('/players',function(req,res,next){
         res.send();
     }
 });
-router.get('/players/:id',function(req,res,next){
+router.get('/:id',function(req,res,next){
     if (assertNumber(req.params.id)){
         let player =  bddPlayer.get(req.params.id);
         res.format({
@@ -54,7 +54,7 @@ router.get('/players/:id',function(req,res,next){
     }).catch(next)
     }
 })
-router.get('/players/new',function(req,res,next){
+router.get('/new',function(req,res,next){
     let player={}
     player["name"]="";
     player["email"]="";
@@ -73,7 +73,7 @@ router.get('/players/new',function(req,res,next){
     }
     }).catch(next)
 })
-router.get('/players/:id/edit',function(req,res,next){
+router.get('/:id/edit',function(req,res,next){
     if (assertNumber(req.params.id)){
         let player=bddPlayer.get(req.id);
         res.format({
@@ -96,7 +96,7 @@ router.get('/players/:id/edit',function(req,res,next){
         res.send();
     }
 })
-router.patch("/players/:id",function(req,res,next){
+router.patch("/:id",function(req,res,next){
     if (assertNumber(req.params.id)){
         bddPlayer.update(req.params.id,req.body);
         res.status=201;
@@ -107,7 +107,7 @@ router.patch("/players/:id",function(req,res,next){
         res.send();
     }
 })
-router.delete("/players/:id",function(req,res,next){
+router.delete("/:id",function(req,res,next){
     if (assertNumber(req.params.id)){
         bddPlayer.remove(req.params.id);
         res.status=201;
@@ -119,5 +119,5 @@ router.delete("/players/:id",function(req,res,next){
     }
 })
 
-
+module.exports=router;
 
