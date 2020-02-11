@@ -1,3 +1,5 @@
+import { arrayExpression } from "babel-types";
+
 const MongoCli = require('mongodb').MongoClient;
 const assert = require('assert');
 const MyEventListener = require("./MyEventListener");
@@ -37,6 +39,16 @@ class MongoDb{
   public stop(){
     this.endReq=true;
   }
+  private convertResult(fromBDD:Object,sourceCols=this.possibleKeysRes,outPutCols=this.possibleKeysQuer) {
+    if(!fromBDD) return fromBDD;
+    let result = {};
+    let i;
+    for (let col in fromBDD) {
+      i=col!==null?sourceCols.indexOf(col):-1
+      if(i!==-1) result[outPutCols[i]] = fromBDD[sourceCols[i]]
+    }
+    return result
+  }
   public init(){
     this.client = new MongoCli(this.urlBDD, { useNewUrlParser: true, useUnifiedTopology: true });
     this.client.connect((err) => {
@@ -47,21 +59,10 @@ class MongoDb{
       (async () => {
         await this.connection
       })()
-    
-    
-      function convertEnResSql(list:string[], cols = this.possibleKeysRes) {
-    
-        const possibleKeys = cols;
-        let result = {};
-        for (let i = 0; i < 6; i++) {
-          result[possibleKeys[i]] = list[i]
-        }
-        return result
-      }
       //
       const fonctions = {
         get: (itemId) => {
-          return this.toPromise(db_collection.findOne({ rowid: +itemId }))
+          return this.toPromise(db_collection.findOne({ rowid: +itemId })).then(res=>this.convertResult(res))
         },
         count: () => {
           let res = this.toPromise(db_collection.aggregate([{ $group: { _id: "*", count: { $sum: 1 } } }]).toArray());
@@ -71,7 +72,11 @@ class MongoDb{
         },
     
         getAll: (limit, offset) => {
-          return this.toPromise(db_collection.find().skip((offset-1) * limit).limit(limit).toArray())
+          return this.toPromise(db_collection.find().skip((offset-1) * limit).limit(limit).toArray()).then(res=>{
+            let array:any[]=<any[]>res;
+            for(let i in array) array[i]=this.convertResult(array[i])
+            return array;
+          })
         },
     
         insert: (params) => {
@@ -85,7 +90,7 @@ class MongoDb{
               aInsert[this.possibleKeysRes[i]] = params[this.possibleKeysQuer[i]]
             };
             aInsert["rowid"]=params.itemId;
-            return this.toPromise(db_collection.remove({ "rowid": params.itemId })).then(
+            return this.toPromise(db_collection.deleteOne({ "rowid": params.itemId })).then(
               async () => {await this.toPromise(db_collection.insertOne(aInsert));return}
             );
           })()
@@ -95,10 +100,10 @@ class MongoDb{
           itemId=+itemId
           let res=this.toPromise(undefined);
           for (let param in params) {
-            let cas = this.possibleKeysQuer.indexOf(param);
+            let cas = this.possibleKeysQuer.slice(1).indexOf(param);
             if(cas===-1) continue;
             let setter={}
-            setter[param]=params[param]
+            setter[this.possibleKeysRes[cas+1]]=params[param]
             res=db_collection.updateOne(
               { "rowid": itemId },
               { $set: setter }
@@ -108,7 +113,7 @@ class MongoDb{
         },
     
         remove: (itemId) => {
-          return db_collection.remove({ "rowid": +itemId })
+          return db_collection.deleteOne({ "rowid": +itemId })
         }
     
       };

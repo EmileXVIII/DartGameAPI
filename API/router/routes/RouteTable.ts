@@ -12,20 +12,15 @@ class RouteTable{
         this.assertItem=assertItem;
         this.patchItem = function (req,res,next){
             if (assertNumber(req.params.id)){
-                this.bdd.update(req.params.id,req.body);
+                bdd.update(req.params.id,req.body);
                 res.status=201;
                 res.send();
             }
             else{
-                res.status=422;
+                res.statusCode=406;
                 res.send();
             }
         }
-        router.get.bind(this);
-        router.post.bind(this);
-        router.patch.bind(this);
-        router.use.bind(this);
-
         router.post('/',function(req,res,next){
             if(assertItem(req.body)){
                 let cols=bdd.getCols()
@@ -33,27 +28,25 @@ class RouteTable{
                 for (let col of cols){
                     toInsert[col]=req.body[col]
                 }
-                this.bdd.insert(toInsert);
+                bdd.insert(toInsert);
                 res.statusCode=201;
                 res.send();
             }
             else{
-                res.statusCode=422;
+                res.statusCode=406;
                 res.send();
             }
-        }.bind(this));
+        });
 
         router.get('/',async function(req,res,next){
         
             let limit:number=assertNumber(req.limit)?req.limit:50;
             let offset:number=assertNumber(req.offset)?req.offset:1;
             let collectionRows=await bdd.getAll(limit,offset)
-            res.format.bind(this)
               res.format({
                 html: () => {
-                    res.statusCode=201;
-                    res.render.bind(this)
-                    res.render('things/index.pug', {
+                    res.statusCode=200;
+                    res.render('renderCollection/index.pug', {
                         items:collectionRows,
                         collectionName:item,
                         title:"get"+item+"s offset "+offset+" limit "+limit,
@@ -61,53 +54,50 @@ class RouteTable{
                     })
                 },
                 json: () => {
-                    res.statusCode=201;
-                    res.body=JSON.stringify(collectionRows);
+                    res.statusCode=200;
+                    res.json(collectionRows);
                     res.send()
                 }
             })
-        }.bind(this))
+        })
         router.get('/:id',async function(req,res,next){
             if (assertNumber(req.params.id)){
-                let thing = await bdd.get(req.params.id);
-                console.log(thing)
-                res.format.bind(this);
+                let collectionRow = await bdd.get(req.params.id);
                 res.format({
                 html: () => {
-                    res.status=201;
-                    res.render('things/index.pug', {
-                        players:[thing],
+                    res.statusCode=200;
+                    res.render('renderCollection/index.pug', {
+                        players:[collectionRow],
                         title:"get"+this.item+" id "+req.params.id,
                         cols:bdd.getCols()
                     })
                 },
                 json: () => {
-                    res.status=406;
-        
+                    res.statusCode=200;
+                    res.json(collectionRow);
                     res.send()
                 }
             })
             }
             else next();
-        }.bind(this));
+        });
         router.get('/new',function(req,res,next){
             let thing={};
             thing["name"]="";
             thing["email"]="";
-            res.format.bind(this);
             res.format({
                 html: () => {
-                    res.status=201;
-                    res.render(this.item+'s/edit.pug', {
+                    res.statusCode=201;
+                    res.render('renderCollection/edit.pug', {
                         action:"/"+this.item,
                         title:"Form New Player",
                         item:thing,
                         method:"post",
-                        cols:bdd.getCols()
+                        cols:bdd.getCols().slice(1)
                     })
                 },
                 json: () => {
-                    res.status=406;
+                    res.statusCode=406;
                     res.send()
                 }
             })
@@ -119,16 +109,16 @@ class RouteTable{
                 res.format({
                 html: () => {
                     res.status=201;
-                    res.render('players/edit.pug', {
+                    res.render('renderCollection/edit.pug', {
                         action:"/"+this.item+"/"+req.params.id,
                         title:"Form New Player",
                         item:thing,
                         method:"post",
-                        cols:this.bdd.getCols()
+                        cols:this.bdd.getCols().slice(1)
                     })
                 },
                 json: () => {
-                    res.status=406;
+                    res.statusCode=406;
                     res.send()
                 }
             })
@@ -143,7 +133,7 @@ class RouteTable{
         router.delete("/:id",function(req,res,next){
             if (assertNumber(req.params.id)){
                 this.bdd.remove(req.params.id);
-                res.status=201;
+                res.status=203;
                 res.send();
             }
             else{

@@ -4,13 +4,11 @@ block content
   h1= title
   p Voici la liste des utilisateurs :
 
-  a(href=href) Ajouter un utilisateur
+  a(href='/'+collectionName+'s/new') Ajouter un utilisateur
   table(border=1)
     tr
-      th Id
-      th Nom
-      th Email
-      th Action
+      each col in cols
+        th #{col}
 
     each item in items
       tr
