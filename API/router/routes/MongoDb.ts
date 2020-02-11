@@ -71,7 +71,6 @@ class MongoDb{
         },
     
         getAll: (limit, offset) => {
-          console.log('I')
           return this.toPromise(db_collection.find().skip((offset-1) * limit).limit(limit).toArray())
         },
     
@@ -149,6 +148,7 @@ class MongoDb{
       Promise.resolve(true)
     })()
   }
+  public getCols() {return this.possibleKeysQuer};
   public get(itemId) {return this.eventListener.emit('get', itemId)};
   public count() {return this.eventListener.emit('count')};
   public getAll(limit, offset){return this.eventListener.emit('getAll', limit, offset)};

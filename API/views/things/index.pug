@@ -1,0 +1,22 @@
+extends ../layout
+
+block content
+  h1= title
+  p Voici la liste des utilisateurs :
+
+  a(href=href) Ajouter un utilisateur
+  table(border=1)
+    tr
+      th Id
+      th Nom
+      th Email
+      th Action
+
+    each item in items
+      tr
+        each col in cols
+          td #{item.col}
+        td
+          a(href='/players/' + player.rowid) Voir
+          a(href='/players/' + player.rowid + '/edit') Éditer
+          a(href='/players/' + player.rowid + '?_method=delete') Supprimer
