@@ -10,7 +10,7 @@ router.get("/",function(req,res,next){
     res.format({
         html: () => {
            res.status=308;
-           res.render('views/redirection.pug', {
+           res.render('redirection.pug', {
                 URL: host+"/game",
                 title:"redirection"
             })

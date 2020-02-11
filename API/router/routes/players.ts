@@ -1,8 +1,24 @@
 import assertPlayer from "../../asserts/assertPlayer";
 import MongoDb from "./MongoDb";import assertNumber from "../../asserts/assertNumber";
 undefined
+var $ = require('jquery').ajax;
 const router =  require('express').Router();
+const host= require("../../main.ts").host;
 const bddPlayer:MongoDb = require("../router.ts").bddPlayers
+
+function patchPlayer(req,res,next){
+    if (assertNumber(req.params.id)){
+        bddPlayer.update(req.params.id,req.body);
+        res.status=201;
+        res.send();
+    }
+    else{
+        res.status=422;
+        res.send();
+    }
+}
+
+
 
 router.get('/',async function(req,res,next){
 
@@ -22,8 +38,9 @@ router.get('/',async function(req,res,next){
 
             res.send()
         }
-    }).catch(next)
+    })
 })
+
 router.post('/',function(req,res,next){
     if(assertPlayer(req.body)){
         bddPlayer.insert({"name":req.body.name,"email":req.body.email});
@@ -52,29 +69,31 @@ router.get('/:id',async function(req,res,next){
 
             res.send()
         }
-    }).catch(next)
+    })
     }
-})
+    else next();
+});
 router.get('/new',function(req,res,next){
     let player={};
     player["name"]="";
     player["email"]="";
     res.format({
-    html: () => {
-        res.status=201;
-        res.render('players/edit.pug', {
-            action:"/game/players",
-            title:"Form New Player",
-            player:player,
-            method:"post"
-        })
-    },
-    json: () => {
-        res.status=406;
-        res.send()
-    }
-    }).catch(next)
-})
+        html: () => {
+            res.status=201;
+            res.render('players/edit.pug', {
+                action:"/game/players",
+                title:"Form New Player",
+                player:player,
+                method:"post"
+            })
+        },
+        json: () => {
+            res.status=406;
+            res.send()
+        }
+    })
+});
+
 router.get('/:id/edit',async function(req,res,next){
     if (assertNumber(req.params.id)){
         let player=await bddPlayer.get(req.params.id);
@@ -85,31 +104,22 @@ router.get('/:id/edit',async function(req,res,next){
                 action:"/game/players/"+req.params.id,
                 title:"Form New Player",
                 player:player,
-                method:"patch"
+                method:"post"
             })
         },
         json: () => {
             res.status=406;
             res.send()
         }
-    }).catch(next)
+    })
     }
     else{
         res.status=422;
         res.send();
     }
 })
-router.patch("/:id",function(req,res,next){
-    if (assertNumber(req.params.id)){
-        bddPlayer.update(req.params.id,req.body);
-        res.status=201;
-        res.send();
-    }
-    else{
-        res.status=422;
-        res.send();
-    }
-})
+router.post("/:id",patchPlayer);
+router.patch("/:id",patchPlayer);
 router.delete("/:id",function(req,res,next){
     if (assertNumber(req.params.id)){
         bddPlayer.remove(req.params.id);
@@ -121,6 +131,17 @@ router.delete("/:id",function(req,res,next){
         res.send();
     }
 })
+router.use(function(req, res){
+    res.status = 404;
+    res.format({
+        html: () => {
+            res.send("<h2>Cannot "+req.method+" "+req.originalUrl+"</h2>")
+        },
+        json: () => {
+            res.send()
+        }
+    })
+});
 
 module.exports=router;
 

@@ -24,7 +24,6 @@ class MongoDb{
         console.log(1)
         while (!this.endReq) {
           await this.awaitXs(2)
-          console.log('yes')
         }
         resolve(true)
       })()
