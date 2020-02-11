@@ -79,7 +79,7 @@ class MongoDb{
             let aInsert = {};
             let len:number= this.possibleKeysRes.length;
             let newId = await this.toPromise(db_collection.aggregate([{ $group: { _id: "*", max: { $max: "$rowid" } } }]).toArray());
-            newId=newId[0]["max"]?newId[0]["max"]:0;
+            newId=newId[0]?newId[0]["max"]:0;
             params.itemId = Number(newId) + 1
             for (let i = 0; i < len; i++) {
               aInsert[this.possibleKeysRes[i]] = params[this.possibleKeysQuer[i]]

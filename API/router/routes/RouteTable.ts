@@ -26,41 +26,47 @@ class RouteTable{
         router.patch.bind(this);
         router.use.bind(this);
 
+        router.post('/',function(req,res,next){
+            if(assertItem(req.body)){
+                let cols=bdd.getCols()
+                let toInsert={}
+                for (let col of cols){
+                    toInsert[col]=req.body[col]
+                }
+                this.bdd.insert(toInsert);
+                res.statusCode=201;
+                res.send();
+            }
+            else{
+                res.statusCode=422;
+                res.send();
+            }
+        }.bind(this));
+
         router.get('/',async function(req,res,next){
         
             let limit:number=assertNumber(req.limit)?req.limit:50;
             let offset:number=assertNumber(req.offset)?req.offset:1;
-            let things=await bdd.getAll(limit,offset)
+            let collectionRows=await bdd.getAll(limit,offset)
             res.format.bind(this)
               res.format({
                 html: () => {
-                    res.status=201;
+                    res.statusCode=201;
                     res.render.bind(this)
                     res.render('things/index.pug', {
-                        items:things,
-                        title:"get"+this.item+"s offset "+offset+" limit "+limit,
-                        cols:this.bdd.getCols()
+                        items:collectionRows,
+                        collectionName:item,
+                        title:"get"+item+"s offset "+offset+" limit "+limit,
+                        cols:bdd.getCols()
                     })
                 },
                 json: () => {
-                    res.status=201;
-        
+                    res.statusCode=201;
+                    res.body=JSON.stringify(collectionRows);
                     res.send()
                 }
             })
         }.bind(this))
-        
-        router.post('/',function(req,res,next){
-            if(assertItem(req.body)){
-                this.bdd.insert({"name":req.body.name,"email":req.body.email});
-                res.status=201;
-                res.send();
-            }
-            else{
-                res.status=422;
-                res.send();
-            }
-        }.bind(this));
         router.get('/:id',async function(req,res,next){
             if (assertNumber(req.params.id)){
                 let thing = await bdd.get(req.params.id);
@@ -106,7 +112,6 @@ class RouteTable{
                 }
             })
         }.bind(this));
-        
         router.get('/:id/edit',async function(req,res,next){
             if (assertNumber(req.params.id)){
                 let thing=await bdd.get(req.params.id);
@@ -147,7 +152,7 @@ class RouteTable{
             }
         }.bind(this))
         router.use(function(req, res){
-            res.status = 404;
+            res.statusCode = 404;
             res.format.bind(this);
             res.format({
                 html: () => {

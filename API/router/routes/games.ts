@@ -6,8 +6,8 @@ const bddGames:MongoDb = require("../router.ts").bddGames
 const playerRouter = require('./players.ts');
 function assertGame(game){
     if(
-        ''+game.mode in ['around-the-world' , '301' , 'cricket'] &&
-        status in ['draft' , 'started' , 'ended']
+        ''+game.mode in {'around-the-world':'' , '301':'' , 'cricket':''} &&
+        game.status in {'draft':'' , 'started':'' , 'ended':''}
     ) return true
     return false
 };
