@@ -70,14 +70,15 @@ class MongoDb{
             (result) => result[0]["count"]
           )
         },
-    
-        getAll: (limit, offset) => {
-          return this.toPromise(db_collection.find().skip((offset-1) * limit).limit(limit).toArray()).then(res=>{
+        getBy: (object,limit, offset) => {
+          return this.toPromise(db_collection.find(object).skip((offset-1) * limit).limit(limit).toArray()).then(res=>{
             let array:any[]=<any[]>res;
             for(let i in array) array[i]=this.convertResult(array[i])
             return array;
           })
         },
+    
+        getAll: (limit, offset) => fonctions.getBy({},limit,offset),
     
         insert: (params) => {
           return (async () => {
@@ -120,6 +121,7 @@ class MongoDb{
       this.eventListener.on('get', (itemId) => fonctions.get(itemId));
       this.eventListener.on('count', () => fonctions.count());
       this.eventListener.on('getAll', (limit, offset) => fonctions.getAll(limit, offset));
+      this.eventListener.on('getBy', (object,limit, offset) => fonctions.getBy(object,limit, offset));
       this.eventListener.on('insert', (params) => fonctions.insert(params));
       this.eventListener.on('update', (itemId, params) => fonctions.update(itemId, params));
       this.eventListener.on('remove', (itemId) => fonctions.remove(itemId));
@@ -157,6 +159,7 @@ class MongoDb{
   public get(itemId) {return this.eventListener.emit('get', itemId)};
   public count() {return this.eventListener.emit('count')};
   public getAll(limit, offset){return this.eventListener.emit('getAll', limit, offset)};
+  public getBy(object,limit, offset){return this.eventListener.emit('getBy',object, limit, offset)};
   public insert(params){return this.eventListener.emit('insert', params)};
   public update(itemId, params){return this.eventListener.emit('update', itemId, params)};
   public remove(itemId) {return this.eventListener.emit('remove', itemId)};

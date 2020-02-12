@@ -40,8 +40,8 @@ class RouteTable{
 
         router.get('/',async function(req,res,next){
         
-            let limit:number=assertNumber(req.limit)?req.limit:50;
-            let offset:number=assertNumber(req.offset)?req.offset:1;
+            let limit:number=assertNumber(req.query.limit)?req.query.limit:50;
+            let offset:number=assertNumber(req.query.offset)?req.query.offset:1;
             let collectionRows=await bdd.getAll(limit,offset)
               res.format({
                 html: () => {
@@ -147,10 +147,9 @@ class RouteTable{
                 res.statusCode=422;
                 res.send();
             }
-        }.bind(this))
+        })
         router.use(function(req, res){
             res.statusCode = 404;
-            res.format.bind(this);
             res.format({
                 html: () => {
                     res.send("<h2>Cannot "+req.method+" "+req.originalUrl+"</h2>")
@@ -159,7 +158,7 @@ class RouteTable{
                     res.send()
                 }
             })
-        }.bind(this));
+        });
         this.router=router;
         this.patchItem.bind(this);
     }

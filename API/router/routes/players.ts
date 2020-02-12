@@ -1,8 +1,6 @@
 import assertPlayer from "../../asserts/assertPlayer";
-import MongoDb from "./MongoDb";import assertNumber from "../../asserts/assertNumber";
+import MongoDb from "./MongoDb";
 import RoadsPlayers from "./RouteTable"
-undefined
-var $ = require('jquery').ajax;
 const router =  require('express').Router();
 const host= require("../../main.ts").host;
 const bddPlayers:MongoDb = require("../router.ts").bddPlayers
