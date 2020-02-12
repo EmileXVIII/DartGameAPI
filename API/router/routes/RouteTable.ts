@@ -139,7 +139,7 @@ class RouteTable{
         router.patch("/:id",this.patchItem);
         router.delete("/:id",function(req,res,next){
             if (assertNumber(req.params.id)){
-                this.bdd.remove(req.params.id);
+                bdd.remove(req.params.id);
                 res.statusCode=202;
                 res.send();
             }

@@ -88,7 +88,7 @@ class MongoDb{
             newId=newId[0]?newId[0]["max"]:0;
             params.itemId = Number(newId) + 1
             for (let i = 0; i < len; i++) {
-              aInsert[this.possibleKeysRes[i]] = params[this.possibleKeysQuer[i]]
+              aInsert[this.possibleKeysRes[i]] = ""+params[this.possibleKeysQuer[i]]
             };
             aInsert["rowid"]=params.itemId;
             return this.toPromise(db_collection.deleteOne({ "rowid": params.itemId })).then(
@@ -104,7 +104,7 @@ class MongoDb{
             let cas = this.possibleKeysQuer.slice(1).indexOf(param);
             if(cas===-1) continue;
             let setter={}
-            setter[this.possibleKeysRes[cas+1]]=params[param]
+            setter[this.possibleKeysRes[cas+1]]=""+params[param]
             res=db_collection.updateOne(
               { "rowid": itemId },
               { $set: setter }

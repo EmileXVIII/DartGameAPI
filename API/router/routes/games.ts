@@ -33,11 +33,10 @@ router.patch("/:id",function(req,res,next){
     }
 })
 router.use("/:id/players", function(req,res,next){
-    req.originalUrl="/gamePlayer/game"+req.params.id;
-    req.baseUrl="/gamePlayer/game"+req.params.id;
-    next();
+    res.redirect("/gamePlayers/game/"+req.params.id+"?include=players");
+    //next();
 })
+router.use("/gamePlayers",gamePlayerRouter)
+router.use("/players",playerRouter)
 let roadGame = new RoadsGames(router,bddGames,"game",assertGame.assertGame)
-roadGame.router.use("/gamePlayer",gamePlayerRouter)
-roadGame.router.use("/players",playerRouter)
 module.exports=roadGame.router;
