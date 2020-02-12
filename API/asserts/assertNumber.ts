@@ -1,4 +1,4 @@
 function assertNumber(num:any){
-    return !isNaN(Number(num))
+    return num===+num||num===''+(+num)
 }
 export default assertNumber;

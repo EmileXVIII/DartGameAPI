@@ -1,6 +1,6 @@
 function assertPlayer(body){
     if(body.name&&body.email){
-        return(isEmail(body.email)||body.name.length!==0)
+        return(isEmail(body.email)&&body.name.length!==0)
     }
     return false;
 }
