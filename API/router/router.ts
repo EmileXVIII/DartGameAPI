@@ -12,7 +12,7 @@ router.get("/",function(req,res,next){
         html: () => {
            res.status=308;
            res.render('redirection.pug', {
-                URL: host+"/game",
+                URL: host+"/games",
                 title:"redirection"
             })
         },
@@ -20,7 +20,7 @@ router.get("/",function(req,res,next){
             res.status=308;
             res.send()
         }
-    }).catch(next)
+    })
 });
 router.use("/games",gameRouter);
 router.use("/players",playerRouter);

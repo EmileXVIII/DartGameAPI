@@ -2,7 +2,7 @@ extends ../layout
 
 block content
   h1= title
-  p Voici la liste des utilisateurs :
+  p Voici la liste des #{collectionName}s :
 
   a(href='/'+collectionName+'s/new') Ajouter un utilisateur
   table(border=1)
@@ -15,6 +15,6 @@ block content
         each col in cols
           td #{item[col]}
         td
-          a(href='/'+collectionName+'s/' + item.rowid) Voir
-          a(href='/'+collectionName+'s/' + item.rowid + '/edit') Éditer
-          a(href='/'+collectionName+'s/' + item.rowid + '?_method=delete') Supprimer
+          a(href='/'+collectionName+'s/' + item[cols[0]]) Voir
+          a(href='/'+collectionName+'s/' + item[cols[0]] + '/edit') Éditer
+          a(href='/'+collectionName+'s/' + item[cols[0]] + '?_method=delete') Supprimer

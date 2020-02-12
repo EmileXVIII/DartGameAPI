@@ -2,13 +2,13 @@ import assertNumber from "../../asserts/assertNumber";
 import MongoDb from "./MongoDb";
 class RouteTable{
     bdd:MongoDb
-    item:string
+    collectionName:string
     router:any
     assertItem:any
     patchItem
-    constructor(router,bdd:MongoDb,item:string,assertItem){
+    constructor(router,bdd:MongoDb,collectionName:string,assertItem){
         this.bdd=bdd;
-        this.item=item;
+        this.collectionName=collectionName;
         this.assertItem=assertItem;
         this.patchItem = function (req,res,next){
             if (assertNumber(req.params.id)){
@@ -48,8 +48,8 @@ class RouteTable{
                     res.statusCode=200;
                     res.render('renderCollection/index.pug', {
                         items:collectionRows,
-                        collectionName:item,
-                        title:"get"+item+"s offset "+offset+" limit "+limit,
+                        collectionName:collectionName,
+                        title:"get"+collectionName+"s offset "+offset+" limit "+limit,
                         cols:bdd.getCols()
                     })
                 },
@@ -61,23 +61,31 @@ class RouteTable{
             })
         })
         router.get('/:id',async function(req,res,next){
-            if (assertNumber(req.params.id)){
+            if(req.query._method==="delete") {
+                req.method="DELETE";
+                next();
+            }
+            else if (assertNumber(req.params.id)){
                 let collectionRow = await bdd.get(req.params.id);
-                res.format({
-                html: () => {
-                    res.statusCode=200;
-                    res.render('renderCollection/index.pug', {
-                        players:[collectionRow],
-                        title:"get"+this.item+" id "+req.params.id,
-                        cols:bdd.getCols()
-                    })
-                },
-                json: () => {
-                    res.statusCode=200;
-                    res.json(collectionRow);
-                    res.send()
+                if (collectionRow===null){
+                    next()
                 }
-            })
+                else res.format({
+                    html: () => {
+                        res.statusCode=200;
+                        res.render('renderCollection/index.pug', {
+                            collectionName:collectionName,
+                            items:[collectionRow],
+                            title:"get"+collectionName+"s id "+req.params.id,
+                            cols:bdd.getCols()
+                        })
+                    },
+                    json: () => {
+                        res.statusCode=200;
+                        res.json(collectionRow);
+                        res.send()
+                    }
+                })
             }
             else next();
         });
@@ -89,7 +97,7 @@ class RouteTable{
                 html: () => {
                     res.statusCode=201;
                     res.render('renderCollection/edit.pug', {
-                        action:"/"+this.item,
+                        action:"/"+collectionName+"s",
                         title:"Form New Player",
                         item:thing,
                         method:"post",
@@ -105,16 +113,15 @@ class RouteTable{
         router.get('/:id/edit',async function(req,res,next){
             if (assertNumber(req.params.id)){
                 let thing=await bdd.get(req.params.id);
-                res.format.bind(this);
                 res.format({
                 html: () => {
                     res.status=201;
                     res.render('renderCollection/edit.pug', {
-                        action:"/"+this.item+"/"+req.params.id,
+                        action:"/"+collectionName+"s/"+req.params.id,
                         title:"Form New Player",
                         item:thing,
                         method:"post",
-                        cols:this.bdd.getCols().slice(1)
+                        cols:bdd.getCols().slice(1)
                     })
                 },
                 json: () => {
@@ -133,11 +140,11 @@ class RouteTable{
         router.delete("/:id",function(req,res,next){
             if (assertNumber(req.params.id)){
                 this.bdd.remove(req.params.id);
-                res.status=203;
+                res.statusCode=202;
                 res.send();
             }
             else{
-                res.status=422;
+                res.statusCode=422;
                 res.send();
             }
         }.bind(this))

@@ -8,7 +8,7 @@ block content
     each col in cols
       label
         strong #{col}
-        input(name=col value=item.col)
+        input(name=col value=item[col])
         br
     label
       input(type="submit" value="Envoyer")
