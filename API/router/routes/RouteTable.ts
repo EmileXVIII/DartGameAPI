@@ -1,17 +1,18 @@
 import assertNumber from "../../asserts/assertNumber";
 import MongoDb from "./MongoDb";
+import IAssertItem from "../../asserts/IAssertItem";
 class RouteTable{
     bdd:MongoDb
     collectionName:string
     router:any
     assertItem:any
     patchItem
-    constructor(router,bdd:MongoDb,collectionName:string,assertItem){
+    constructor(router,bdd:MongoDb,collectionName:string,assertItem:IAssertItem){
         this.bdd=bdd;
         this.collectionName=collectionName;
         this.assertItem=assertItem;
         this.patchItem = function (req,res,next){
-            if (assertNumber(req.params.id)){
+            if (assertNumber(req.params.id)&&assertItem.assertPartialItem(req.body)){
                 bdd.update(req.params.id,req.body);
                 res.status=201;
                 res.send();
@@ -22,7 +23,7 @@ class RouteTable{
             }
         }
         router.post('/',async function(req,res,next){
-            if(assertItem(req.body)){
+            if(assertItem.assertItem(req.body)){
                 let cols=bdd.getCols()
                 let toInsert={}
                 for (let col of cols){
@@ -121,7 +122,7 @@ class RouteTable{
                 html: () => {
                     res.status=201;
                     res.render('renderCollection/edit.pug', {
-                        action:"/"+collectionName+"s/"+req.params.id,
+                        action:"/"+collectionName+"s/"+req.params.id+"?_method=patch",
                         title:"Form New Player",
                         item:thing,
                         method:"post",

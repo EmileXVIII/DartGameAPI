@@ -1,4 +1,4 @@
-import assertPlayer from "../../asserts/assertPlayer";
+import assertPlayer from "../../asserts/AssertPlayer";
 import MongoDb from "./MongoDb";
 import RoadsPlayers from "./RouteTable"
 const router =  require('express').Router();

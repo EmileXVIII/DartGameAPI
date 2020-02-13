@@ -70,7 +70,6 @@ router.post("/game/:id",async function(req,res,next){
                 bddGamePlayer.insert(toInsert)
             }
         }
-        else  axiosLocal.post('/players', req.body[listInd])
     }
     res.statusCode=202
     res.send()
