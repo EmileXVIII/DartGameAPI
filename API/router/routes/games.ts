@@ -34,7 +34,6 @@ router.patch("/:id",function(req,res,next){
 })
 router.use("/:id/players", function(req,res,next){
     res.redirect("/gamePlayers/game/"+req.params.id+"?include=players");
-    //next();
 })
 router.use("/gamePlayers",gamePlayerRouter)
 router.use("/players",playerRouter)
