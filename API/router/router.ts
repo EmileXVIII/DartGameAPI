@@ -9,6 +9,13 @@ module.exports = {"router":router,"bddPlayers":bddPlayers,"bddGames":bddGames,"b
 const gameRouter = require('./routes/games.ts');
 const playerRouter = require('./routes/players.ts');
 const gamePlayer = require('./routes/gamePlayer.ts');
+router.use(function(req,res,next){
+    if (req.query._method){
+        if (req.query._method.toLowerCase() in {"post":"","get":"","delete":"","patch":"","put":""})
+            req.method=req.query._method.toUpperCase()
+    }
+    next();
+    })
 router.get("/",function(req,res,next){
     res.format({
         html: () => {

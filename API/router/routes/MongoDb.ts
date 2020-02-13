@@ -71,7 +71,7 @@ class MongoDb{
           )
         },
         getBy: (object,limit, offset) => {
-          return this.toPromise(db_collection.find(object).skip((offset-1) * limit).limit(limit).toArray()).then(res=>{
+          return this.toPromise(db_collection.find(this.convertResult(object)).skip((offset-1) * limit).limit(limit).toArray()).then(res=>{
             let array:any[]=<any[]>res;
             for(let i in array) array[i]=this.convertResult(array[i])
             return array;

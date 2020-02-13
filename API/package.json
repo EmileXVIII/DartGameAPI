@@ -20,6 +20,8 @@
     "express": "^4.17.1",
     "mongodb": "^3.5.2",
     "pug": "^2.0.4",
+    "request": "^2.88.2",
+    "sync-request": "^6.1.0",
     "ts-node": "^8.6.2",
     "typescript": "^3.7.5",
     "xmlhttprequest": "^1.8.0"

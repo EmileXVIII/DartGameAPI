@@ -7,6 +7,7 @@ import { globalAgent } from "http";
 const router =  require('express').Router();
 const host= require("../../main.ts").host;
 const axios = require("axios");
+const request = require('request');
 const axiosLocal = axios.create({baseURL: 'http://localhost:8080'})
 const bddGamePlayer:MongoDb = require("../router.ts").bddGamePlayer
 const bddPlayers:MongoDb = require("../router.ts").bddPlayers
@@ -73,6 +74,25 @@ router.post("/game/:id",async function(req,res,next){
     }
     res.statusCode=202
     res.send()
+})
+router.delete("/game/:id",async function(req,res,next){
+    if (assertNumber(req.query.id)){
+        let result = await axiosLocal.get('/games/'+req.params.id)
+        if(result.data.status==="draft"){
+            for(let id of req.query.id){
+                result = await axiosLocal.post('/gamePlayers?_method=get&hasBody=1',{"playerId":id,"gameId":req.params.id})
+                if(result.data)
+                    axiosLocal.delete('/gamePlayers/'+result.data[0]["id"])
+            }
+            res.statusCode=200;
+            res.send();
+        }
+        else{
+            res.statusCode=422;
+            res.send();
+        }
+    }
+    else next();
 })
 let playerGame = new RoadsPlayers(router,bddGamePlayer,"gamePlayer",assertGamePlayer)
 
