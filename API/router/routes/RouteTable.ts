@@ -21,16 +21,16 @@ class RouteTable{
                 res.send();
             }
         }
-        router.post('/',function(req,res,next){
+        router.post('/',async function(req,res,next){
             if(assertItem(req.body)){
                 let cols=bdd.getCols()
                 let toInsert={}
                 for (let col of cols){
                     toInsert[col]=req.body[col]
                 }
-                bdd.insert(toInsert);
+                let body = await bdd.insert(toInsert);
                 res.statusCode=201;
-                res.send();
+                res.json(body);
             }
             else{
                 res.statusCode=406;
@@ -42,7 +42,11 @@ class RouteTable{
         
             let limit:number=assertNumber(req.query.limit)?req.query.limit:50;
             let offset:number=assertNumber(req.query.offset)?req.query.offset:1;
-            let collectionRows=await bdd.getAll(limit,offset)
+            let collectionRows;
+            if(req.query["hasBody"]==1)
+                collectionRows=await bdd.getBy(req.body,limit,offset)
+            else
+                collectionRows=await bdd.getAll(limit,offset)
               res.format({
                 html: () => {
                     res.statusCode=200;

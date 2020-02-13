@@ -92,7 +92,10 @@ class MongoDb{
             };
             aInsert["rowid"]=params.itemId;
             return this.toPromise(db_collection.deleteOne({ "rowid": params.itemId })).then(
-              async () => {await this.toPromise(db_collection.insertOne(aInsert));return}
+              async () => {
+                let res = await this.toPromise(db_collection.insertOne(aInsert));
+                return this.convertResult(res["ops"][0],this.possibleKeysRes,this.possibleKeysQuer)
+              }
             );
           })()
         },

@@ -58,9 +58,14 @@ router.get("/game/:id",async function(req,res,next){
 })
 router.post("/game/:id",async function(req,res,next){
     for (let listInd in req.body){
-        if(assertNumber(req.body[listInd])){
-            if(await bddPlayers.get(req.body[listInd])!==null){
-                let toInsert={"playerId":req.body[listInd],"gameId":req.params.id,"remainingShots":0,"score":0}
+        let idPlayer=req.body[listInd];
+        if (!(assertNumber(idPlayer))){
+            let player=await axiosLocal.post('/players', req.body[listInd]);
+            idPlayer=player.data.id;
+        }
+        if(assertNumber(idPlayer)){
+            if(await bddPlayers.get(idPlayer)!==null){
+                let toInsert={"playerId":idPlayer,"gameId":req.params.id,"remainingShots":0,"score":0}
                 bddGamePlayer.insert(toInsert)
             }
         }

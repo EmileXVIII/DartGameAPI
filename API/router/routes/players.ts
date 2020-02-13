@@ -5,8 +5,8 @@ const router =  require('express').Router();
 const host= require("../../main.ts").host;
 const bddPlayers:MongoDb = require("../router.ts").bddPlayers
 
-let playerGame = new RoadsPlayers(router,bddPlayers,"player",assertPlayer)
+let playerRouter = new RoadsPlayers(router,bddPlayers,"player",assertPlayer)
 
 
-module.exports=playerGame.router;
+module.exports=playerRouter.router;
 
