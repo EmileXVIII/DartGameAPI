@@ -5,7 +5,10 @@ const router = require('express').Router();
 const bddGames:MongoDb = require("../router.ts").bddGames
 const playerRouter = require('./players.ts');
 const axios = require("axios");
-const axiosLocal = axios.create({baseURL: 'http://localhost:8080'})
+const host = require("../../main.ts").host
+const hostEngine = require("../../main.ts").hostEngine
+const axiosLocal = axios.create({baseURL: host})
+const axiosDist = axios.create({baseURL: hostEngine})
 const gamePlayerRouter = require('./gamePlayer.ts');
 router.post("/:id/shots",async function(req,res,next){
     let result=await axiosLocal.get("/games/"+req.params.id);
@@ -54,6 +57,16 @@ router.use("/:id/players", async function(req,res,next){
     let result = await axiosLocal.post("/gamePlayers/game/"+req.params.id+"?include=players&&_method="+req.method,req.body)
     res.statusCode=result.status;
     res.json(result.data);
+})
+router.post("/:id/run",async (req,res,next)=>{
+    let result=await axiosLocal.get("/games/"+req.params.id)
+    result = await axiosDist.post("/run?mode="+result.data.mode+"&gameId="+req.params.id,{}).catch((err)=>console.warn(err))
+    if(result){
+        res.statusCode=result.status;
+        res.body=result.data;
+    }
+    else res.statusCode=500;
+    res.send()
 })
 router.use("/gamePlayers",gamePlayerRouter)
 router.use("/players",playerRouter)

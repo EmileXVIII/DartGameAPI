@@ -53,7 +53,7 @@ class MongoDb{
     this.client = new MongoCli(this.urlBDD, { useNewUrlParser: true, useUnifiedTopology: true });
     this.client.connect((err) => {
       assert.equal(null, err);
-      console.log("conected with BDD");
+      console.log("connected with BDD");
       const db = this.client.db(this.dbName);
       const db_collection = db.collection(this.collectionName);
       (async () => {

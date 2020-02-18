@@ -1,7 +1,9 @@
 const PORT =process.env.PORT||8080
-const host="localhost:"+PORT;
+const host="http://localhost:"+PORT;
+const PORTengine=process.env.PORTengine||8081
+const hostEngine="http://localhost:"+PORTengine;
 const urlBdd = "mongodb://root:pwd@localhost:3306/";
-module.exports={"urlBdd":urlBdd,"PORT":PORT,"host":host}
+module.exports={"urlBdd":urlBdd,"PORT":PORT,"host":host,"hostEngine":hostEngine}
 const app = require('express')()
 const express = require('express');
 const bodyParser = require('body-parser')
