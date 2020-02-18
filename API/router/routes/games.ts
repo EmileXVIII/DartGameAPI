@@ -14,7 +14,9 @@ router.post("/:id/shots",async function(req,res,next){
         res.send();
     }
     else{
-        req.body.playerId=result.data.currentPlayerId;
+        if(!assertNumber(req.body.playerId)){
+            req.body.playerId=result.data.currentPlayerId;
+        }
         req.body.gameId=req.params.id;
         result=await axiosLocal.post("/shots",req.body)
         res.statusCode=result.status;
