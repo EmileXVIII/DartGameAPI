@@ -1,11 +1,13 @@
-import MongoDb from "./routes/MongoDb";
-const urlBdd = require('../main.ts').urlBdd
+import BDDPlayers from "../models/Player";
+import BDDGames from "../models/Game";
+import BDDGamePlayers from "../models/GamePlayers";
+import BDDGameShots from "../models/GameShots";
 const host = require('../main.ts').host
 const router = require('express').Router(); 
-const bddPlayers = new MongoDb(["id","name","email"],["rowid","name","email"],urlBdd,"dbPlayer","players")
-const bddGames = new MongoDb(["id",  "mode",  "name",  "currentPlayerId",  "status",  "createdAt"],["rowid", "mode",  "name",  "currentPlayerId",  "status",  "createdAt"],urlBdd,"dbGames","games")
-const bddGamePlayer = new MongoDb(["id",  "playerId",  "gameId",  "remainingShots",  "score",  "rank","order","createdAt"],["rowid",  "playerId",  "gameId",  "remainingShots",  "score",  "rank","order","createdAt"],urlBdd,"dbGames","gamePlayer");
-const bddShots = new MongoDb(["id",  "playerId",  "gameId","multiplicator","sector","createdAt"],["rowid",  "playerId",  "gameId","multiplicator","sector","createdAt"],urlBdd,"dbGames","shots");
+const bddPlayers = BDDPlayers;
+const bddGames = BDDGames;
+const bddGamePlayer = BDDGamePlayers;
+const bddShots = BDDGameShots;
 module.exports = {"router":router,"bddPlayers":bddPlayers,"bddGames":bddGames,"bddGamePlayer":bddGamePlayer,"bddShots":bddShots};
 const gameRouter = require('./routes/games.ts');
 const playerRouter = require('./routes/players.ts');

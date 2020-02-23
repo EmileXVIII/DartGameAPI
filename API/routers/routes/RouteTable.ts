@@ -1,19 +1,20 @@
 import assertNumber from "../../asserts/assertNumber";
 import MongoDb from "./MongoDb";
 import IAssertItem from "../../asserts/IAssertItem";
+import BddReqs from "../../utils/BddReqs";
 class RouteTable{
-    bdd:MongoDb
+    bdd:BddReqs;
     collectionName:string
     router:any
     assertItem:any
     patchItem
-    constructor(router,bdd:MongoDb,collectionName:string,assertItem:IAssertItem){
+    constructor(router,bdd:BddReqs,collectionName:string,assertItem:IAssertItem){
         this.bdd=bdd;
         this.collectionName=collectionName;
         this.assertItem=assertItem;
         this.patchItem = function (req,res,next){
             if (assertNumber(req.params.id)&&assertItem.assertPartialItem(req.body)){
-                bdd.update(req.params.id,req.body);
+                bdd.updateOne(req.params.id,req.body);
                 res.status=201;
                 res.send();
             }
@@ -29,7 +30,7 @@ class RouteTable{
                 for (let col of cols){
                     toInsert[col]=req.body[col]
                 }
-                let body = await bdd.insert(toInsert);
+                let body = await bdd.insertOne(toInsert);
                 res.statusCode=201;
                 res.json(body);
             }
@@ -42,12 +43,13 @@ class RouteTable{
         router.get('/',async function(req,res,next){
         
             let limit:number=assertNumber(req.query.limit)?req.query.limit:50;
-            let offset:number=assertNumber(req.query.offset)?req.query.offset:1;
+            let offset:number=assertNumber(req.query.page)?req.query.page:1;
+            let sortName:string=req.query.sort?req.query.sort:"id";
             let collectionRows;
             if(req.query["hasBody"]==1)
-                collectionRows=await bdd.getBy(req.body,limit,offset)
+                collectionRows=await bdd.getBy(req.body,limit,offset,sortName)
             else
-                collectionRows=await bdd.getAll(limit,offset)
+                collectionRows=await bdd.getAll()
               res.format({
                 html: () => {
                     res.statusCode=200;
@@ -71,7 +73,7 @@ class RouteTable{
                 next();
             }
             else if (assertNumber(req.params.id)){
-                let collectionRow = await bdd.get(req.params.id);
+                let collectionRow = await bdd.getOne(req.params.id);
                 if (collectionRow===null){
                     next()
                 }
@@ -117,7 +119,7 @@ class RouteTable{
         }.bind(this));
         router.get('/:id/edit',async function(req,res,next){
             if (assertNumber(req.params.id)){
-                let thing=await bdd.get(req.params.id);
+                let thing=await bdd.getOne(req.params.id);
                 res.format({
                 html: () => {
                     res.status=201;
@@ -144,7 +146,7 @@ class RouteTable{
         router.patch("/:id",this.patchItem);
         router.delete("/:id",function(req,res,next){
             if (assertNumber(req.params.id)){
-                bdd.remove(req.params.id);
+                bdd.removeOne(req.params.id);
                 res.statusCode=202;
                 res.send();
             }

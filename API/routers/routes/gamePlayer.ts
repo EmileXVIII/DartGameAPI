@@ -1,16 +1,16 @@
 //import assertPlayer from "../../asserts/assertPlayer";
-import MongoDb from "./MongoDb";
 import RoadsPlayers from "./RouteTable"
 import assertNumber from "../../asserts/assertNumber";
 import assertGamePlayer from "../../asserts/AssertGamePlayer";
 import { globalAgent } from "http";
+import BddReqs from "../../utils/BddReqs";
 const router =  require('express').Router();
 const host= require("../../main.ts").host;
 const axios = require("axios");
 const request = require('request');
 const axiosLocal = axios.create({baseURL: 'http://localhost:8080'})
-const bddGamePlayer:MongoDb = require("../router.ts").bddGamePlayer
-const bddPlayers:MongoDb = require("../router.ts").bddPlayers
+const bddGamePlayer:BddReqs = require("../router.ts").bddGamePlayer
+const bddPlayers:BddReqs = require("../router.ts").bddPlayers
 router.get("/game/:id",async function(req,res,next){     
     let limit:number=assertNumber(req.query.limit)?req.query.limit:50;
     let offset:number=assertNumber(req.query.offset)?req.query.offset:1;
@@ -19,7 +19,7 @@ router.get("/game/:id",async function(req,res,next){
     if(req.query.include==="players"){
         let player
         for(let i=0;i<collectionRows.length;i++){
-            player=await(bddPlayers.get(collectionRows[i]["playerId"]))
+            player=await(bddPlayers.getOne(collectionRows[i]["playerId"]))
             if(player) playerRows.push(player);
         }
         res.format({
@@ -65,9 +65,9 @@ router.post("/game/:id",async function(req,res,next){
             idPlayer=player.data.id;
         }
         if(assertNumber(idPlayer)){
-            if(await bddPlayers.get(idPlayer)!==null){
+            if(await bddPlayers.getOne(idPlayer)!==null){
                 let toInsert={"playerId":idPlayer,"gameId":req.params.id,"remainingShots":0,"score":0}
-                bddGamePlayer.insert(toInsert)
+                bddGamePlayer.insertOne(toInsert)
             }
         }
     }

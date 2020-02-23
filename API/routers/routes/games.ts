@@ -1,8 +1,9 @@
 import RoadsGames from "./RouteTable"
 import assertGame from "../../asserts/AssertGame";
-import MongoDb from "./MongoDb";import assertNumber from "../../asserts/assertNumber";
+import assertNumber from "../../asserts/assertNumber";
+import BddReqs from "../../utils/BddReqs";
 const router = require('express').Router();
-const bddGames:MongoDb = require("../router.ts").bddGames
+const bddGames:BddReqs = require("../router.ts").bddGames
 const playerRouter = require('./players.ts');
 const axios = require("axios");
 const host = require("../../main.ts").host
@@ -31,7 +32,7 @@ router.post("/:id", function(req,res,next){
     next();
 })
 router.patch("/:id",function(req,res,next){
-    let game = bddGames.get(req.params.id)
+    let game = bddGames.getOne(req.params.id)
     if(game===null){
         res.statusCode=404;
         res.send()

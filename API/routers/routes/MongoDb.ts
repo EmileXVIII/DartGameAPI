@@ -70,28 +70,36 @@ class MongoDb{
             (result) => result[0]["count"]
           )
         },
-        getBy: (object,limit, offset) => {
-          return this.toPromise(db_collection.find(this.convertResult(object)).skip((offset-1) * limit).limit(limit).toArray()).then(res=>{
+        getBy: (object,limit, offset,sortName) => {
+          let sortInd=this.possibleKeysQuer[sortName];
+          let sortCasted={};
+          if(sortName===-1){
+            sortCasted[this.possibleKeysRes[0]]=1;
+          }
+          else sortCasted[this.possibleKeysRes[sortName]]=1;
+          return this.toPromise(db_collection.find(this.convertResult(object)).skip((offset-1) * limit).limit(limit).sort(sortCasted).toArray()).then(res=>{
             let array:any[]=<any[]>res;
             for(let i in array) array[i]=this.convertResult(array[i])
             return array;
           })
         },
     
-        getAll: (limit, offset) => fonctions.getBy({},limit,offset),
+        getAll: (limit, offset,sortName) => fonctions.getBy({},limit,offset,sortName),
     
         insert: (params) => {
           return (async () => {
             let aInsert = {};
             let len:number= this.possibleKeysRes.length;
-            let newId = await this.toPromise(db_collection.aggregate([{ $group: { _id: "*", max: { $max: "$rowid" } } }]).toArray());
+            let newId = await this.toPromise(db_collection.aggregate([{ $group: { _id: "*", max: { $max: "$"+this.possibleKeysRes[0] } } }]).toArray());
             newId=newId[0]?newId[0]["max"]:0;
             params.itemId = Number(newId) + 1
             for (let i = 0; i < len; i++) {
               aInsert[this.possibleKeysRes[i]] = ""+params[this.possibleKeysQuer[i]]
             };
-            aInsert["rowid"]=params.itemId;
-            return this.toPromise(db_collection.deleteOne({ "rowid": params.itemId })).then(
+            aInsert[this.possibleKeysRes[0]]=params.itemId;
+            let where={};
+            where[this.possibleKeysRes[0]]=params.itemId;
+            return this.toPromise(db_collection.deleteOne(where)).then(
               async () => {
                 let res = await this.toPromise(db_collection.insertOne(aInsert));
                 return this.convertResult(res["ops"][0],this.possibleKeysRes,this.possibleKeysQuer)
@@ -108,8 +116,10 @@ class MongoDb{
             if(cas===-1) continue;
             let setter={}
             setter[this.possibleKeysRes[cas+1]]=""+params[param]
+            let where={};
+            where[this.possibleKeysRes[0]]=itemId;
             res=db_collection.updateOne(
-              { "rowid": itemId },
+              where,
               { $set: setter }
             )
           }
@@ -117,14 +127,16 @@ class MongoDb{
         },
     
         remove: (itemId) => {
-          return db_collection.deleteOne({ "rowid": +itemId })
+          let where={};
+          where[this.possibleKeysRes[0]]=+itemId;
+          return db_collection.deleteOne(where)
         }
     
       };
       this.eventListener.on('get', (itemId) => fonctions.get(itemId));
       this.eventListener.on('count', () => fonctions.count());
-      this.eventListener.on('getAll', (limit, offset) => fonctions.getAll(limit, offset));
-      this.eventListener.on('getBy', (object,limit, offset) => fonctions.getBy(object,limit, offset));
+      this.eventListener.on('getAll', (limit, offset,sortName) => fonctions.getAll(limit, offset,sortName));
+      this.eventListener.on('getBy', (object,limit, offset,sortName) => fonctions.getBy(object,limit, offset,sortName));
       this.eventListener.on('insert', (params) => fonctions.insert(params));
       this.eventListener.on('update', (itemId, params) => fonctions.update(itemId, params));
       this.eventListener.on('remove', (itemId) => fonctions.remove(itemId));
