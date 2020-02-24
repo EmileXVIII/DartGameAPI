@@ -2,8 +2,8 @@ import CreateMongooseShema from "../utils/CreateMongooseShema";
 import MongoDb from "../routers/routes/MongoDb";
 import BddReqs from "../utils/BddReqs";
 const mongoose = require('mongoose');
-const BDDGamesColsQuery = ["id",  "mode",  "name",  "currentPlayerId",  "status",  "createdAt"];
-const BDDGamesColsAnswers = ["rowid", "mode",  "name",  "currentPlayerId",  "status",  "createdAt"]
+const BDDGamesColsQuery = ["id",  "mode",  "name",  "currentPlayerId",  "status", "winBy", "createdAt"];
+const BDDGamesColsAnswers = ["rowid", "mode",  "name",  "currentPlayerId",  "status", "winBy", "createdAt"]
 const urlBdd = require('../main.ts').urlBdd
 let BDDGames;
 switch(process.env.BDD){

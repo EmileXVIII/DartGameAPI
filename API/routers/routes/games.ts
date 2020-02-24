@@ -43,9 +43,17 @@ router.patch("/:id",async function(req,res,next){
                 next();
                 break;
             default:
-                req.body={"status":req.body.status}
-                if(req.body.status in assertGame.getPossibleGameStatus()){
-                    next()
+                if(Object.keys(req.body).length===1){
+                    if(req.body.status in assertGame.getPossibleGameStatus()){
+                        next()
+                    }
+                    else if(req.body.currentPlayerId||req.body.winBy){
+                        next();
+                    }
+                    else{
+                        res.statusCode=410;
+                        res.send();
+                    }
                 }
                 else{
                     res.statusCode=410;
