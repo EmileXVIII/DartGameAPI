@@ -14,11 +14,12 @@ class AssertPlayer implements IAssertItem{
             result=result||body.name.length!==0
         }
         else return false;
-        if(body.name==undefined){}
+        if(body.email==undefined){}
         else if(body.email){
             result = result&&this.isEmail(''+body.email)
         }
         else return false;
+        return result;
     }
     isEmail(email:string){
         let partEmail=email.split("@");

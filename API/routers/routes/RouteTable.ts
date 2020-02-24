@@ -12,9 +12,9 @@ class RouteTable{
         this.bdd=bdd;
         this.collectionName=collectionName;
         this.assertItem=assertItem;
-        this.patchItem = function (req,res,next){
+        this.patchItem = async function (req,res,next){
             if (assertNumber(req.params.id)&&assertItem.assertPartialItem(req.body)){
-                bdd.updateOne(req.params.id,req.body);
+                let result=await bdd.updateOne(req.params.id,req.body);
                 res.status=201;
                 res.send();
             }

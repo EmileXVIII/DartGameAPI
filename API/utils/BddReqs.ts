@@ -24,14 +24,14 @@ class BddReqs{
             default:
                 this.schema=bdd.schema;
                 this.updateOne=(id,params)=>{
-                    bdd.updateOne({"id":+id},{$set:params});
+                    return bdd.updateOne({"id":+id},{$set:params});
                 }
                 this.getCols=()=>this.schema.cols;
                 this.insertOne=async (body)=>{
                     let newId = await bdd.aggregate([{ $group: { _id: "*", max: { $max: "$"+this.getCols()[0] } } }])
                     newId=newId[0]?newId[0]["max"]:0;
                     body[this.getCols()[0]] = Number(newId) + 1
-                    new bdd(body).save()
+                    return new bdd(body).save()
                 };
                 this.getBy=(body,limit,offset,sortName)=>bdd.find(body).skip(limit*(offset-1)).limit(limit).sort(sortName);
                 this.getAll=(limit,offset,sortName)=>bdd.find().skip(limit*(offset-1)).limit(limit).sort(sortName);
