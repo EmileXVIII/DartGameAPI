@@ -31,8 +31,8 @@ router.post("/:id", function(req,res,next){
     req.method="PATCH"
     next();
 })
-router.patch("/:id",function(req,res,next){
-    let game = bddGames.getOne(req.params.id)
+router.patch("/:id",async function(req,res,next){
+    let game = await bddGames.getOne(req.params.id)
     if(game===null){
         res.statusCode=404;
         res.send()

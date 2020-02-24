@@ -23,7 +23,9 @@ class BddReqs{
             case "mongoose":
             default:
                 this.schema=bdd.schema;
-                this.updateOne=(id,params)=>bdd.updateOne({"id":id},params);
+                this.updateOne=(id,params)=>{
+                    bdd.updateOne({"id":+id},{$set:params});
+                }
                 this.getCols=()=>this.schema.cols;
                 this.insertOne=async (body)=>{
                     let newId = await bdd.aggregate([{ $group: { _id: "*", max: { $max: "$"+this.getCols()[0] } } }])
