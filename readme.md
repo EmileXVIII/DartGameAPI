@@ -10,14 +10,14 @@ L'application est séparés en 2  parties.
         PORT
     - pour démarrer :
         - ts-node /api/api.ts : pour relier avec l'api
-        - ts-node /main.ts "api||console" [ gameid ] : pour démarer en manuel
+        - ts-node /main.ts  : pour démarer en manuel
     - remarques les logs sont affichées dans la console de l'engine
  - L'api (git@github.com:EmileXVIII/DartGameAPI.git):
     - variables d'environnement:
         - PORTengine
         - PORT
         - URLbdd
-        - BDD = "perso||mongoose"
+        - BDD = perso||mongoose
     - pour démarrer :
         - ts-node /main.ts
     - les routes:
@@ -41,3 +41,17 @@ L'application est séparés en 2  parties.
         - DELETE /games/{id}/players
         - POST /games/{id}/shots
         - POST /games/{id}/run : envoie le game à l'engine et le démare si sont statut est "started"
+        - GET /games/{id}/interface : renvoie une interface pour jouer plus facilement
+
+Example de jeu:
+- creation
+    - POST /games
+    - POST /games/{id}/players
+- lancement 
+    - POST /games/{id}/run
+- déroulement
+    - recuperer l' id du suivant player : GET /games/{id}
+    - recuperer les infos sur le player : GET /players/{id}
+    - recuperer les infos sur les scores : GET /gamePlayers
+    - tirer : POST /games/{id}/shots
+    - rmq : si sur navigateur plus facile avec /games/{id}/interface
