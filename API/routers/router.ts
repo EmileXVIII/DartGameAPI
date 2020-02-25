@@ -18,6 +18,11 @@ router.use(function(req,res,next){
         if (req.query._method.toLowerCase() in {"post":"","get":"","delete":"","patch":"","put":""})
             req.method=req.query._method.toUpperCase()
     }
+    if (req.query.paramsToBody && req.query.paramsToBody==1){
+        for(let name in req.query)
+            if (!(name in {"paramsToBody":"","hasBody":"","_method":""}))
+            req.body[name]=req.query[name]
+    }
     next();
     })
 router.get("/",function(req,res,next){

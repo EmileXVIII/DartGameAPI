@@ -47,9 +47,9 @@ class RouteTable{
             let sortName:string=req.query.sort?req.query.sort:"id";
             let collectionRows;
             if(req.query["hasBody"]==1)
-                collectionRows=await bdd.getBy(req.body,limit,offset,sortName)
+                collectionRows=await bdd.getBy(req.body,+limit,+offset,sortName)
             else
-                collectionRows=await bdd.getAll()
+                collectionRows=await bdd.getAll(+limit,+offset,sortName)
               res.format({
                 html: () => {
                     res.statusCode=200;

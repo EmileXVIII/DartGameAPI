@@ -31,6 +31,28 @@ router.post("/:id", function(req,res,next){
     req.method="PATCH"
     next();
 })
+router.get("/:id/interface", async function(req,res,next){
+    let result = await axiosLocal.get("games/"+req.params.id);
+    if (result==null){
+        res.statusCode=404;
+        res.send()
+    }
+    else{
+        res.format({
+            html: () => {
+                res.statusCode=200;
+                res.render('userInterface/racourcis.pug', {
+                    id:req.params.id,
+                    status:result.data.status
+                })
+            },
+            json: () => {
+                res.statusCode=406;
+                res.send()
+            }
+        })
+    }
+})
 router.patch("/:id",async function(req,res,next){
     let game = await bddGames.getOne(req.params.id)
     if(game===null){

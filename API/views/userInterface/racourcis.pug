@@ -1,0 +1,88 @@
+extends ../layout
+
+block content
+  form(
+    method="get"
+    action="/games/"+id
+  )
+    label
+      input(type="submit" value="getGame" formaction="/games/"+id)
+    br
+    br
+    label
+      input(type="submit" value="getPlayers" formaction="/games/"+id+"/players")
+  br
+  br
+  form(
+    method="get"
+    action="/gamePlayers?hasBody=1&paramsToBody=1"
+  )
+    label
+      strong #{"getPlayers infos in game"}
+      br
+      br
+      input(type="hidden" name="hasBody" value="1")
+      input(type="hidden" name="paramsToBody" value="1")
+      label(for="gameId") gameId
+      input(type="gameId" name="gameId" value=id)
+      br
+      label(for="playerId") playerId
+      input(type="playerId" name="playerId" value="")
+      br
+    label
+      input(type="submit" value="getPlayersInfos")
+  br
+  br
+  form(
+    method="post"
+    action="/shots?paramsToBody=1"
+  )
+    label
+      strong #{"shot"}
+      input(type="hidden" name="paramsToBody" value="1")
+      br
+      br
+      label(for="gameId") gameId
+      input(type="gameId" name="gameId" value=id)
+      br
+      label(for="playerId") playerId 
+      input(type="playerId" name="playerId" value="")
+      br
+      label(for="multiplicator") multiplicator
+      input(type="multiplicator" name="multiplicator" value="")
+      br
+      label(for="sector") sector
+      input(type="sector" name="sector" value="")
+      br
+    label
+      input(type="submit" value="send Shot")
+      br
+  br
+  br
+  form(
+    method="post"
+    action="/games/"+id+"?_method=patch&paramsToBody=1"
+  )
+    label
+      strong #{"changeGameStatus"}
+      input(type="hidden" name="_method" value="patch")
+      input(type="hidden" name="paramsToBody" value="1")
+      br
+      br
+      label(for="status") status
+      input(type="status" name="status" value=status)
+      br
+    label
+      input(type="submit" value="send")
+  br
+  br
+  form(
+    method="post"
+    action="/games/"+id+"/run?paramsToBody=1"
+  )
+    input(type="hidden" name="paramsToBody" value="1")
+    label
+      strong #{"run game if status == started"}
+      br
+    label
+      input(type="submit" value="runGame")
